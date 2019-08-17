@@ -1,0 +1,19 @@
+{
+  "name": "bionic-discord-bot",
+  "version": "1.0.0",
+  "description": "A Discord Bot Made By SneaX! with some major security improvements",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "keywords": [
+    "discord"
+  ],
+  "author": "SneaXDev",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "eslint": "^6.1.0",
+    "fs": "0.0.1-security"
+  }
+}
