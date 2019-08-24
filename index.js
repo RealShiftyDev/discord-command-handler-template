@@ -9,7 +9,6 @@ client.on("ready", async () => {
 
 const fs = require('fs');
 client.commands = new Discord.Collection();
-client.aliases = new Discord.Collection();
 
 fs.readdir("./commands/", (err, files) => {
     if(err) console.log(err);
@@ -19,23 +18,20 @@ fs.readdir("./commands/", (err, files) => {
 
     jsfile.forEach((f, i) => {
         let pull = require(`./commands/${f}`);
-        client.commands.set(pull.config.name, pull)
-        pull.config.aliases.forEach(alias => {
-            client.aliases.set(alias, pull.config.name)
-        })
+        client.commands.set(pull.config.name, Object.assign(pull, { 
+            triggers: [ pull.config.name, ...(pull.config.aliases || []) ];
+        }))
     })
 });
 
 client.on("message", async message => {
+    const prefix = botconfig.prefix;
     if(message.author.bot || message.channel.type === 'dm') return;
-
-    let prefix = botconfig.prefix;
-    let messageArray = message.content.split(" ");
-    let cmd = messageArray[0];
-    let args = messageArray.slice(1);
-
     if(!message.content.startsWith(prefix)) return;
-    let commandFile = client.commands.get(cmd.slice(prefix.length)) || client.commands.get(client.aliases.get(cmd.slice(prefix.length)))
+
+    const [ cmd, ...args ] = message.content.slice(prefix.length).split(/ +/g) 
+
+    let commandFile = client.commands.find(c => c.triggers.includes(cmd.toLowerCase()));
     if(commandFile) commandFile.run(client, message, args)
 })
 
